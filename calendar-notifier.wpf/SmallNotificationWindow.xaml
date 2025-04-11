@@ -7,39 +7,12 @@
         mc:Ignorable="d"
         Title="SmallNotificationWindow" Height="450" Width="350
         " Topmost="true" WindowStyle="None" Background="Transparent" AllowsTransparency="True" WindowState="Normal" WindowStartupLocation="CenterScreen" >
-    <StackPanel>
+    <ItemsControl ItemsSource="{Binding Notifications}">
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <local:SmallNotificationUserControl Margin="5" />
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
 
-
-        <ItemsControl ItemsSource="{Binding Notifications}" >
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Grid>
-                        <local:SmallNotificationUserControl Margin="5" />
-                    </Grid>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-
-
-        <Grid VerticalAlignment="Top">
-            <Rectangle RadiusX="5" RadiusY="5" Fill="LightGray" Opacity="0.8" />
-            <Grid >
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-
-                <Rectangle Grid.Column="0" Fill="Red" Width="30" Height="30" Margin="5" VerticalAlignment="Top" />
-
-                <StackPanel Grid.Column="1" Margin="5">
-                    <TextBlock Text="Custom Notification" FontWeight="Bold"/>
-                    <TextBlock Text="This is the text of a notification message"/>
-                </StackPanel>
-
-                <Button Name="closeButton" Grid.Column="2" Content="X" Width="30" Height="30" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5" />
-
-            </Grid>
-        </Grid>
-    </StackPanel>
 </Window>

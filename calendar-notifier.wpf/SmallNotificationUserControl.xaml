@@ -18,9 +18,11 @@
             <Rectangle Grid.Column="0" Fill="Red" Width="30" Height="30" Margin="5" VerticalAlignment="Top" />
 
             <StackPanel Grid.Column="1" Margin="5">
-                <TextBlock Text="Custom Notification" FontWeight="Bold"/>
-                <TextBlock Text="This is the text of a notification message"/>
+                <TextBlock Text="{Binding Subject}" FontWeight="Bold"/>
+                <TextBlock Text="{Binding SubTitle}"/>
             </StackPanel>
+
+            <Button Click="{Binding Click}" />
 
             <Button Name="closeButton" Grid.Column="2" Content="X" Width="30" Height="30" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5" />
 

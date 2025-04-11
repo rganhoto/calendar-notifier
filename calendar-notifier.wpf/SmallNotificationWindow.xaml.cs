@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using calendar_notifier.core;
 
 namespace calendar_notifier.wpf
 {
@@ -21,12 +22,12 @@ namespace calendar_notifier.wpf
     public partial class SmallNotificationWindow : Window
     {
 
-        public IList<object> Notifications { get; set; } = new ObservableCollection<object>() { new object(), new object() };
+        public IList<MeetingItemDP> Notifications { get; set; } = new ObservableCollection<MeetingItemDP>() { };
 
         public SmallNotificationWindow()
         {
             InitializeComponent();
-            this.closeButton.Click += CloseButton_Click;
+            //this.closeButton.Click += CloseButton_Click;
 
             this.DataContext = this;
         }
@@ -36,7 +37,7 @@ namespace calendar_notifier.wpf
         public void AddNotification(string title, string message)
         {
             // Create a new notification item
-            Notifications.Add("TESTE");
+            Notifications.Add(new MeetingItemDP() { Subject = $"TESTE {Notifications.Count}", SubTitle = "Isto é um subtitulo" });
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)

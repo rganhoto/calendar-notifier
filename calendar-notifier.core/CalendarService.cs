@@ -7,8 +7,7 @@ namespace calendar_notifier.core
         // Simulate the calendar service for testing purposes
         bool simulated = false;
 
-
-        public EventHandler<Outlook.AppointmentItem> OnNotifcation { get; set; } = null!;
+        public EventHandler<MeetingItem> OnNotifcation { get; set; } = null!;
 
         public CalendarService()
         {
@@ -20,7 +19,7 @@ namespace calendar_notifier.core
             try
             {
                 if (!simulated)
-                    ReadFromOutlook();
+                    ReadMeetingList();
                 else
                     SimulateCalendarEvent();
             }
@@ -32,18 +31,21 @@ namespace calendar_notifier.core
 
         }
 
-
-        private void ReadFromOutlook()
+        public List<MeetingItem> ReadMeetingList()
         {
             var outlookApp = new Outlook.Application();
             Outlook.NameSpace outlookNs = outlookApp.GetNamespace("MAPI");
-            outlookNs.Logon();
+            outlookNs.Logon("Outlook");
 
             Outlook.MAPIFolder calendar = outlookNs.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderCalendar);
 
-            var items = calendar.Items.Restrict("[Start] >= Now()"); // Find items starting from now
+
+            var items = calendar.Items.Restrict($"[Start] >= '{DateTime.Now.ToString("yyyy-MM-dd HH:mm")}' AND [Start] < '{DateTime.Today.AddDays(1).ToString("yyyy-MM-dd HH:mm")}'"); // Find items starting from now
 
             items.Sort("[Start]"); // Sort by start date
+
+
+            var listMeetings = new List<MeetingItem>();
 
             foreach (Outlook.AppointmentItem item in items)
             {
@@ -51,17 +53,42 @@ namespace calendar_notifier.core
                 if (item.MeetingStatus == Outlook.OlMeetingStatus.olMeetingCanceled)
                     continue;
 
-                Console.WriteLine($"{item.Subject} at {item.Start}");
+                if (item.Start.TimeOfDay < DateTime.Now.TimeOfDay)
+                    continue;
 
-                OnNotifcation?.Invoke(this, item);
-                // Requires Microsoft.Toolkit.Uwp.Notifications NuGet package version 7.0 or greater
-             
+                MeetingItem meeting = new MeetingItem()
+                {
+                    Subject = item.Subject,
+                    Start = item.Start,
+                    StartHour = item.Start.TimeOfDay,
+                    AppointmentId = item.GlobalAppointmentID
+                };
+
+                listMeetings.Add(meeting);
+
+                Console.WriteLine($"{item.Subject} at {item.Start.TimeOfDay}");
             }
+
+            listMeetings = listMeetings.OrderBy(x => x.StartHour).ToList();
+
+
+            return listMeetings;
+
+            //foreach (var meeting in listMeetings)
+            //{
+            //    OnNotifcation?.Invoke(this, meeting);
+            //}
         }
 
         private void SimulateCalendarEvent()
         {
-            OnNotifcation?.Invoke(this, null);
+            var meeting = new MeetingItem()
+            {
+                Start = DateTime.Now.AddMinutes(5),
+                Subject = "Simulated Meeting"
+            };
+
+            OnNotifcation?.Invoke(this, meeting);
         }
     }
 }

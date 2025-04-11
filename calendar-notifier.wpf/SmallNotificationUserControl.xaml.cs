@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using calendar_notifier.core;
 
 namespace calendar_notifier.wpf
 {
@@ -23,6 +24,16 @@ namespace calendar_notifier.wpf
         public SmallNotificationUserControl()
         {
             InitializeComponent();
+            closeButton.Click += CloseButton_Click;
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.DataContext is MeetingItemDP item)
+            {
+                item.Subject = "Clicou";
+                item.SubTitle = "Clicou no botão";
+            }
         }
     }
 }

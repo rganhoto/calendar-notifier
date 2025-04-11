@@ -1,60 +1,47 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using System.Reflection;
 using calendar_notifier.core;
 using Microsoft.Toolkit.Uwp.Notifications;
-using Windows.Foundation.Collections;
-using Outlook = Microsoft.Office.Interop.Outlook;
 
-Console.WriteLine("Hello, World!");
+var calendarWorker = new CalendarWorker();
 
-
-
-// Initialize any required services or configurations here
-// Listen to notification activation
-ToastNotificationManagerCompat.OnActivated += toastArgs =>
+calendarWorker.OnNotification += (sender, item) =>
 {
-    // Obtain the arguments from the notification
-    ToastArguments args = ToastArguments.Parse(toastArgs.Argument);
-
-    // Obtain any user input (text boxes, menu selections) from the notification
-    ValueSet userInput = toastArgs.UserInput;
-
-    // Need to dispatch to UI thread if performing UI operations
-    //Application.Current.Dispatcher.Invoke(delegate
-    //{
-    //    // TODO: Show the corresponding content
-    //    MessageBox.Show("Toast activated. Args: " + toastArgs.Argument);
-    //});
+    new ToastContentBuilder()
+       .AddText(item.Item1.Subject)
+       .AddText(item.Item1.StartHour.ToString("hh':'mm"))
+       .AddAudio(new Uri("ms-winsoundevent:Notification.Looping.Call6"))
+       .Show();
 };
 
-
-var calendarService = new CalendarService();
-
-calendarService.OnNotifcation += (sender, item) =>
+calendarWorker.MeetingSummary += (sender, item) =>
 {
-    if (item != null)
+    var bld = new ToastContentBuilder()
+       .AddText("Today's Meetings")
+       .AddAudio(new Uri("ms-winsoundevent:Notification.Looping.Call6"));
+
+    foreach (var str in item)
     {
-        // Create a toast notification
-        new ToastContentBuilder()
-            .AddText(item.Subject)
-            .AddText(item.Start.ToString())
-            .AddArgument("action", "viewConversation")
-            .AddArgument("conversationId", item.ConversationIndex.ToString())
-            .Show();
-    }
-    else
-    {    // Create a toast notification
-        new ToastContentBuilder()
-            .AddText("ISTO é UM TESTE")
-            .AddText("MAS QUE GRANDE TESTE")
-            .AddArgument("action", "viewConversation")
-            .AddArgument("conversationId")
-            .Show();
+        bld.AddText(str);
     }
 
+    bld.Show();
 };
 
-calendarService.ReadCalendarEvents();
 
+Console.ForegroundColor = ConsoleColor.Green;
+
+Console.WriteLine("Welcome to Calendar Notifier");
+Console.WriteLine($"v{Assembly.GetExecutingAssembly().GetName().Version}");
+Console.WriteLine();
+
+Console.ResetColor();
+
+
+calendarWorker.Start(true);
 
 Console.ReadLine();
+
+
+calendarWorker.Stop();
